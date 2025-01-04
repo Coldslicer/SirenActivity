@@ -3,7 +3,7 @@ package frc.robot.systems;
 // WPILib Imports
 
 // Third party Hardware Imports
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.spark.SparkMax;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -25,7 +25,7 @@ public class FSMSystem {
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
-	private CANSparkMax exampleMotor;
+	private SparkMax exampleMotor;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -35,8 +35,8 @@ public class FSMSystem {
 	 */
 	public FSMSystem() {
 		// Perform hardware init
-		exampleMotor = new CANSparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER,
-										CANSparkMax.MotorType.kBrushless);
+		exampleMotor = new SparkMax(HardwareMap.CAN_ID_SPARK_SHOOTER,
+										SparkMax.MotorType.kBrushless);
 
 		// Reset state machine
 		reset();
