@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 
 // Systems
 import frc.robot.motors.MotorManager;
+import frc.robot.systems.FSMSystem;
+import frc.robot.systems.PlaceholderFSMSystem;
 import frc.robot.systems.SirenFSMSystem;
 
 /**
@@ -18,7 +20,7 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private SirenFSMSystem sirenSystem;
+	private FSMSystem<?> sirenSystem;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -28,7 +30,9 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		System.out.println("robotInit");
 		input = new TeleopInput();
-		sirenSystem = new SirenFSMSystem();
+		sirenSystem = HardwareMap.isSirenFSMEnabled()
+			? new SirenFSMSystem()
+			: new PlaceholderFSMSystem();
 	}
 
 	@Override
