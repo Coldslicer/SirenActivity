@@ -12,20 +12,20 @@ import frc.robot.HardwareMap;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 
 enum FSMState {
-	START_STATE,
-	OTHER_STATE
+	// added  my states from the state machine diagram
+	CONTROLLER,
+	ON_OFF,
+	CRESCENDO
 }
 
-public class ExampleFSMSystem extends FSMSystem<FSMState> {
+public class SirenFSMSystem extends FSMSystem<FSMState> {
 	/* ======================== Constants ======================== */
-
-	private static final float MOTOR_RUN_POWER = 0.1f;
 
 	/* ======================== Private variables ======================== */
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
-	private SparkMax exampleMotor;
+	private SparkMax sirenMotor;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -33,10 +33,10 @@ public class ExampleFSMSystem extends FSMSystem<FSMState> {
 	 * one-time initialization or configuration of hardware required. Note
 	 * the constructor is called only once when the robot boots.
 	 */
-	public ExampleFSMSystem() {
+	public SirenFSMSystem() {
 		// Perform hardware init using a wrapper class
 		// this is so we can see motor outputs during simulatiuons
-		exampleMotor = new SparkMaxWrapper(HardwareMap.CAN_ID_SPARK_SHOOTER,
+		sirenMotor = new SparkMaxWrapper(HardwareMap.CAN_ID_SPARK_SHOOTER,
 										SparkMax.MotorType.kBrushless);
 
 		// Reset state machine
@@ -50,7 +50,7 @@ public class ExampleFSMSystem extends FSMSystem<FSMState> {
 
 	@Override
 	public void reset() {
-		setCurrentState(FSMState.START_STATE);
+		setCurrentState(FSMState.CONTROLLER);
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -59,12 +59,16 @@ public class ExampleFSMSystem extends FSMSystem<FSMState> {
 	@Override
 	public void update(TeleopInput input) {
 		switch (getCurrentState()) {
-			case START_STATE:
-				handleStartState(input);
+			case CONTROLLER:
+				handleControllerState(input);
 				break;
 
-			case OTHER_STATE:
-				handleOtherState(input);
+			case ON_OFF:
+				handleOnOffState(input);
+				break;
+
+			case CRESCENDO:
+				handleCrescendoState(input);
 				break;
 
 			default:
@@ -75,16 +79,7 @@ public class ExampleFSMSystem extends FSMSystem<FSMState> {
 
 	@Override
 	public boolean updateAutonomous(AutoFSMState autoState) {
-		switch (autoState) {
-			case STATE1:
-				return handleAutoState1();
-			case STATE2:
-				return handleAutoState2();
-			case STATE3:
-				return handleAutoState3();
-			default:
-				return true;
-		}
+		return false;
 	}
 
 	/* ======================== Protected methods ======================== */
@@ -92,15 +87,14 @@ public class ExampleFSMSystem extends FSMSystem<FSMState> {
 	@Override
 	protected FSMState nextState(TeleopInput input) {
 		switch (getCurrentState()) {
-			case START_STATE:
-				if (input != null) {
-					return FSMState.OTHER_STATE;
-				} else {
-					return FSMState.START_STATE;
-				}
+			case CONTROLLER:
+				return FSMState.CONTROLLER;
 
-			case OTHER_STATE:
-				return FSMState.OTHER_STATE;
+			case ON_OFF:
+				return FSMState.ON_OFF;
+
+			case CRESCENDO:
+				return FSMState.CRESCENDO;
 
 			default:
 				throw new IllegalStateException("Invalid state: " + getCurrentState().toString());
@@ -109,43 +103,29 @@ public class ExampleFSMSystem extends FSMSystem<FSMState> {
 
 	/* ------------------------ FSM state handlers ------------------------ */
 	/**
-	 * Handle behavior in START_STATE.
+	 * Handle behavior in CONTROLLER.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleStartState(TeleopInput input) {
-		exampleMotor.set(0);
+	private void handleControllerState(TeleopInput input) {
+
 	}
 	/**
-	 * Handle behavior in OTHER_STATE.
+	 * Handle behavior in ON_OFF.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
-	private void handleOtherState(TeleopInput input) {
-		exampleMotor.set(MOTOR_RUN_POWER);
+	private void handleOnOffState(TeleopInput input) {
+
 	}
 
 	/**
-	 * Performs action for auto STATE1.
-	 * @return if the action carried out has finished executing
+	 * Handle behavior in CRESCENDO.
+	 * @param input Global TeleopInput if robot in teleop mode or null if
+	 *        the robot is in autonomous mode.
 	 */
-	private boolean handleAutoState1() {
-		return true;
+	private void handleCrescendoState(TeleopInput input) {
+
 	}
 
-	/**
-	 * Performs action for auto STATE2.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState2() {
-		return true;
-	}
-
-	/**
-	 * Performs action for auto STATE3.
-	 * @return if the action carried out has finished executing
-	 */
-	private boolean handleAutoState3() {
-		return true;
-	}
 }
