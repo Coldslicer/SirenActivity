@@ -4,6 +4,13 @@ package frc.robot.systems;
 
 // Third party Hardware Imports
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+
+import edu.wpi.first.wpilibj.Timer;
+
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkClosedLoopController;
 
 // Robot Imports
 import frc.robot.TeleopInput;
@@ -21,11 +28,15 @@ enum FSMState {
 public class SirenFSMSystem extends FSMSystem<FSMState> {
 	/* ======================== Constants ======================== */
 
+	private static final float DEFAULT_RUN_POWER = 0.5f;
+
 	/* ======================== Private variables ======================== */
 
 	// Hardware devices should be owned by one and only one system. They must
 	// be private to their owner system and may not be used elsewhere.
 	private SparkMax sirenMotor;
+	private SparkClosedLoopController pid;
+	private Timer timer = new Timer();
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -39,6 +50,11 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 		sirenMotor = new SparkMaxWrapper(HardwareMap.CAN_ID_SPARK_SIREN,
 										SparkMax.MotorType.kBrushless);
 
+		pid = sirenMotor.getClosedLoopController();
+		var config = new ClosedLoopConfig();
+		config.pidf(0.01, 0.01, 0.01, 0.01, ClosedLoopSlot.kSlot0);
+
+		timer.reset();
 		// Reset state machine
 		reset();
 	}
@@ -79,6 +95,7 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 
 	@Override
 	public boolean updateAutonomous(AutoFSMState autoState) {
+		sirenMotor.set(DEFAULT_RUN_POWER);
 		return false;
 	}
 
@@ -88,12 +105,26 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 	protected FSMState nextState(TeleopInput input) {
 		switch (getCurrentState()) {
 			case CONTROLLER:
+				if (input.isCrescendoButtonPressed() && !input.isOnOffButtonPressed()) {
+					timer.reset();
+					return FSMState.CRESCENDO;
+				}
+				if (input.isOnOffButtonPressed() && !input.isCrescendoButtonPressed()) {
+					timer.reset();
+					return FSMState.ON_OFF;
+				}
 				return FSMState.CONTROLLER;
 
 			case ON_OFF:
+				if (input.isOnOffButtonReleased()) {
+					return FSMState.CONTROLLER;
+				}
 				return FSMState.ON_OFF;
 
 			case CRESCENDO:
+				if (input.isCrescendoButtonReleased()) {
+					return FSMState.CONTROLLER;
+				}
 				return FSMState.CRESCENDO;
 
 			default:
@@ -108,15 +139,23 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleControllerState(TeleopInput input) {
-
+		sirenMotor.set(input.getManualPitchInput());
 	}
+
 	/**
 	 * Handle behavior in ON_OFF.
 	 * @param input Global TeleopInput if robot in teleop mode or null if
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleOnOffState(TeleopInput input) {
-
+		if (timer.get() > 2) {
+			if (sirenMotor.get() > 0) {
+				sirenMotor.set(0);
+			} else {
+				sirenMotor.set(DEFAULT_RUN_POWER);
+			}
+			timer.reset();
+		}
 	}
 
 	/**
@@ -125,7 +164,14 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleCrescendoState(TeleopInput input) {
-
+		if (timer.get() > 2) {
+			if (sirenMotor.get() > 0) {
+				pid.setReference(0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+			} else {
+				pid.setReference(DEFAULT_RUN_POWER, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+			}
+			timer.reset();
+		}
 	}
 
 }
