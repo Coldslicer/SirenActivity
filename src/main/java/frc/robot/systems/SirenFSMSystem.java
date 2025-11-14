@@ -36,7 +36,7 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 	public SirenFSMSystem() {
 		// Perform hardware init using a wrapper class
 		// this is so we can see motor outputs during simulatiuons
-		sirenMotor = new SparkMaxWrapper(HardwareMap.CAN_ID_SPARK_SHOOTER,
+		sirenMotor = new SparkMaxWrapper(HardwareMap.CAN_ID_SPARK_SIREN,
 										SparkMax.MotorType.kBrushless);
 
 		// Reset state machine
