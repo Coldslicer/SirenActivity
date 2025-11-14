@@ -1,7 +1,7 @@
 package frc.robot;
 
 // WPILib Imports
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PS4Controller;
 
 /**
  * Common class for providing driver inputs during Teleop.
@@ -12,13 +12,11 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 public class TeleopInput {
 	/* ======================== Constants ======================== */
-	private static final int LEFT_JOYSTICK_PORT = 0;
-	private static final int RIGHT_JOYSTICK_PORT = 1;
+	private static final int CONTROLLER_PORT = 0;
 
 	/* ======================== Private variables ======================== */
 	// Input objects
-	private Joystick leftJoystick;
-	private Joystick rightJoystick;
+	private PS4Controller controller;
 
 	/* ======================== Constructor ======================== */
 	/**
@@ -27,9 +25,7 @@ public class TeleopInput {
 	 * by WPILib until teleop mode.
 	 */
 	public TeleopInput() {
-		leftJoystick = new Joystick(LEFT_JOYSTICK_PORT);
-
-		rightJoystick = new Joystick(RIGHT_JOYSTICK_PORT);
+		controller = new PS4Controller(CONTROLLER_PORT);
 	}
 
 	/* ======================== Public methods ======================== */
@@ -37,50 +33,46 @@ public class TeleopInput {
 	// Method names should be descriptive of the behavior, so the
 	// control mapping is hidden from other classes.
 
-	/* ------------------------ Left Joystick ------------------------ */
+	/* ========================== Controller =========================== */
+
 	/**
-	 * Get X axis of Left Joystick.
-	 * @return Axis value
+	 * Getter for the crescendo button being pressed.
+	 * @return whether the crescendo button was pressed
 	 */
-	public double getLeftJoystickX() {
-		return leftJoystick.getX();
-	}
-	/**
-	 * Get Y axis of Left Joystick.
-	 * @return Axis value
-	 */
-	public double getLeftJoystickY() {
-		return leftJoystick.getY();
-	}
-	/**
-	 * Get the value of the shooter button.
-	 * @return True if button is pressed
-	 */
-	public boolean isShooterButtonPressed() {
-		return leftJoystick.getRawButton(1);
-	}
-	/**
-	 * Get the value of the intake button.
-	 * @return True if button is pressed
-	 */
-	public boolean isIntakeButtonPressed() {
-		return leftJoystick.getRawButton(2);
+	public boolean isCrescendoButtonPressed() {
+		return controller.getSquareButtonPressed();
 	}
 
-	/* ------------------------ Right Joystick ------------------------ */
 	/**
-	 * Get X axis of Right Joystick.
-	 * @return Axis value
+	 * Getter for the crescendo button being released.
+	 * @return whether the crescendo button was released
 	 */
-	public double getRightJoystickX() {
-		return rightJoystick.getX();
+	public boolean isCrescendoButtonReleased() {
+		return controller.getSquareButtonPressed();
 	}
+
 	/**
-	 * Get Y axis of Right Joystick.
-	 * @return Axis value
+	 * Getter for the on-off button being pressed.
+	 * @return whether the on-off button was pressed
 	 */
-	public double getRightJoystickY() {
-		return rightJoystick.getY();
+	public boolean isOnOffButtonPressed() {
+		return controller.getSquareButtonPressed();
+	}
+
+	/**
+	 * Getter for the on-off button being released.
+	 * @return whether the on-off button was released
+	 */
+	public boolean isOnOffButtonReleased() {
+		return controller.getSquareButtonPressed();
+	}
+
+	/**
+	 * Getter for the pitch input axis.
+	 * @return the manual pitch input
+	 */
+	public double getManualPitchInput() {
+		return controller.getLeftY();
 	}
 
 	/* ======================== Private methods ======================== */
