@@ -40,7 +40,7 @@ public class TeleopInput {
 	 * @return whether the crescendo button was pressed
 	 */
 	public boolean isCrescendoButtonPressed() {
-		return controller.getSquareButtonPressed();
+		return controller.getTriangleButtonPressed();
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class TeleopInput {
 	 * @return whether the crescendo button was released
 	 */
 	public boolean isCrescendoButtonReleased() {
-		return controller.getSquareButtonPressed();
+		return controller.getTriangleButtonReleased();
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class TeleopInput {
 	 * @return whether the on-off button was released
 	 */
 	public boolean isOnOffButtonReleased() {
-		return controller.getSquareButtonPressed();
+		return controller.getSquareButtonReleased();
 	}
 
 	/**

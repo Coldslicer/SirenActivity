@@ -47,14 +47,13 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 	public SirenFSMSystem() {
 		// Perform hardware init using a wrapper class
 		// this is so we can see motor outputs during simulatiuons
-		sirenMotor = new SparkMaxWrapper(HardwareMap.CAN_ID_SPARK_SIREN,
+		sirenMotor = new SparkMax(HardwareMap.CAN_ID_SPARK_SIREN,
 										SparkMax.MotorType.kBrushless);
 
 		pid = sirenMotor.getClosedLoopController();
 		var config = new ClosedLoopConfig();
 		config.pidf(0.01, 0.01, 0.01, 0.01, ClosedLoopSlot.kSlot0);
 
-		timer.reset();
 		// Reset state machine
 		reset();
 	}
@@ -67,6 +66,7 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 	@Override
 	public void reset() {
 		setCurrentState(FSMState.CONTROLLER);
+		timer.restart();
 
 		// Call one tick of update to ensure outputs reflect start state
 		update(null);
@@ -74,6 +74,9 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 
 	@Override
 	public void update(TeleopInput input) {
+		if (input == null) {
+			return;
+		}
 		switch (getCurrentState()) {
 			case CONTROLLER:
 				handleControllerState(input);
@@ -103,6 +106,9 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 
 	@Override
 	protected FSMState nextState(TeleopInput input) {
+		if (input == null) {
+			return FSMState.CONTROLLER;
+		}
 		switch (getCurrentState()) {
 			case CONTROLLER:
 				if (input.isCrescendoButtonPressed() && !input.isOnOffButtonPressed()) {
