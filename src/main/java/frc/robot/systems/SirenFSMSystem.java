@@ -14,7 +14,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 
 // Robot Imports
 import frc.robot.TeleopInput;
-import frc.robot.motors.SparkMaxWrapper;
 import frc.robot.HardwareMap;
 import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 
@@ -28,7 +27,7 @@ enum FSMState {
 public class SirenFSMSystem extends FSMSystem<FSMState> {
 	/* ======================== Constants ======================== */
 
-	private static final float DEFAULT_RUN_POWER = 0.5f;
+	private static final float DEFAULT_RUN_POWER = 0.1f;
 
 	/* ======================== Private variables ======================== */
 
@@ -52,7 +51,7 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 
 		pid = sirenMotor.getClosedLoopController();
 		var config = new ClosedLoopConfig();
-		config.pidf(0.01, 0.01, 0.01, 0.01, ClosedLoopSlot.kSlot0);
+		config.pidf(0.00001, 0.001, 0.0005, 0.002, ClosedLoopSlot.kSlot0);
 
 		// Reset state machine
 		reset();
@@ -170,11 +169,12 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 	 *        the robot is in autonomous mode.
 	 */
 	private void handleCrescendoState(TeleopInput input) {
+		System.out.println(sirenMotor.get());
 		if (timer.get() > 2) {
 			if (sirenMotor.get() > 0) {
-				pid.setReference(0, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+				pid.setReference(0, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
 			} else {
-				pid.setReference(DEFAULT_RUN_POWER, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+				pid.setReference(DEFAULT_RUN_POWER, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
 			}
 			timer.reset();
 		}

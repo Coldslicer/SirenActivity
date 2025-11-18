@@ -95,6 +95,6 @@ public class Robot extends TimedRobot {
 	// Do not use robotPeriodic. Use mode specific periodic methods instead.
 	@Override
 	public void robotPeriodic() {
-		System.out.println(sirenSystem.getCurrentState());
+
 	}
 }
