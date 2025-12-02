@@ -21,11 +21,6 @@ public class PlaceholderFSMSystem extends FSMSystem<IdentityStateSpace> {
 	public void update(TeleopInput input) { }
 
 	@Override
-	public boolean updateAutonomous(AutoFSMState autoState) {
-		return false;
-	}
-
-	@Override
 	protected IdentityStateSpace nextState(TeleopInput input) {
 		return IdentityStateSpace.STATE;
 	}

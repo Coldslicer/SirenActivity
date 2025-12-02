@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private FSMSystem<?> sirenSystem;
+	private SirenFSMSystem sirenSystem;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -39,11 +39,13 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		System.out.println("-------- Autonomous Init --------");
 		sirenSystem.reset();
+
+		sirenSystem.getIdleCommand()
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		sirenSystem.updateAutonomous(null);
+		sirenSystem.update(null);
 		// logs motor values
 		MotorManager.update();
 	}

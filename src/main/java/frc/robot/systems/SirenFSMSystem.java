@@ -8,6 +8,9 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -15,9 +18,10 @@ import com.revrobotics.spark.SparkClosedLoopController;
 // Robot Imports
 import frc.robot.TeleopInput;
 import frc.robot.HardwareMap;
-import frc.robot.systems.AutoHandlerSystem.AutoFSMState;
 
 enum FSMState {
+	// new  idle state
+	IDLE,
 	// added  my states from the state machine diagram
 	CONTROLLER,
 	ON_OFF,
@@ -77,6 +81,10 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 			return;
 		}
 		switch (getCurrentState()) {
+			case IDLE:
+				sirenMotor.stopMotor();
+				break;
+
 			case CONTROLLER:
 				handleControllerState(input);
 				break;
@@ -95,20 +103,16 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 		setCurrentState(nextState(input));
 	}
 
-	@Override
-	public boolean updateAutonomous(AutoFSMState autoState) {
-		sirenMotor.set(DEFAULT_RUN_POWER);
-		return false;
-	}
-
 	/* ======================== Protected methods ======================== */
 
 	@Override
 	protected FSMState nextState(TeleopInput input) {
 		if (input == null) {
-			return FSMState.CONTROLLER;
+			return getCurrentState();
 		}
 		switch (getCurrentState()) {
+			case IDLE:
+				return FSMState.IDLE;
 			case CONTROLLER:
 				if (input.isCrescendoButtonPressed() && !input.isOnOffButtonPressed()) {
 					timer.reset();
@@ -178,6 +182,24 @@ public class SirenFSMSystem extends FSMSystem<FSMState> {
 			}
 			timer.reset();
 		}
+	}
+
+	// example commands, add more as needed:
+
+	/**
+	 * Gets the idle command.
+	 * @return a command that sets the FSM into the IDLE state
+	 */
+	public Command getIdleCommand() {
+		return new InstantCommand(() -> this.setCurrentState(FSMState.IDLE));
+	}
+
+	/**
+	 * Gets the run command.
+	 * @return a command that runs the motor
+	 */
+	public Command getRunCommand() {
+		return new InstantCommand(() -> sirenMotor.set(DEFAULT_RUN_POWER));
 	}
 
 }
