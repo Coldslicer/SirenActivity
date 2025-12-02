@@ -5,7 +5,9 @@ package frc.robot;
 
 // WPILib Imports
 import edu.wpi.first.wpilibj.TimedRobot;
-
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 // Systems
 import frc.robot.motors.MotorManager;
 import frc.robot.systems.FSMSystem;
@@ -20,7 +22,7 @@ public class Robot extends TimedRobot {
 	private TeleopInput input;
 
 	// Systems
-	private SirenFSMSystem sirenSystem;
+	private FSMSystem<?> sirenSystem;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -40,7 +42,21 @@ public class Robot extends TimedRobot {
 		System.out.println("-------- Autonomous Init --------");
 		sirenSystem.reset();
 
-		sirenSystem.getIdleCommand()
+		SirenFSMSystem sirenFSMSystemCasted = (SirenFSMSystem) sirenSystem;
+
+		// TODO: do the following task
+		// Implement commands in SirenFSMSystem to do the following things:
+		// IDLE state for 5 seconds
+		// ON_OFF state for 5 seconds
+		// CRESCENDO state for 5 seconds
+		// IDLE state for 5 seconds
+
+		// the following auto runs the motor for 5 seconds
+		Command sampleAuto = sirenFSMSystemCasted.getRunCommand()
+				.alongWith(new WaitCommand(5))
+				.andThen(sirenFSMSystemCasted.getIdleCommand());
+
+		sampleAuto.schedule();
 	}
 
 	@Override
